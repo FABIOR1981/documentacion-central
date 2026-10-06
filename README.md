@@ -13,12 +13,15 @@ En cada proyecto, la carpeta `documentacion/` tiene solo un `LEEME.md` que remit
 | Proyecto | Contenido |
 |---|---|
 | [base_smconsultores](base_smconsultores/documentacion) | Manual de usuario (MD y PDF) |
+| [bitacora-proyectos](bitacora-proyectos/documentacion) | Manual de usuario: consulta y modo admin (MD y PDF) |
 | [controlHorasClientes](controlHorasClientes/documentacion) | Manual de usuario (MD y PDF) y detalle ampliado de la aplicación |
 | [Espacia-test](Espacia-test/documentacion) | Manual de usuario, readme extendido y requerimientos |
+| [generador-Brochures](generador-Brochures/documentacion) | Manual de usuario (MD y PDF) |
+| [generador-documento](generador-documento/documentacion) | Manual de usuario (MD y PDF) |
 | [gestor-imagenes-cloudinary](gestor-imagenes-cloudinary/documentacion) | Manuales de usuario: administrador y clientes por tipo de enlace (MD y PDF) |
 | [gestor_pruebas_llamados](gestor_pruebas_llamados/documentacion) | Manual de usuario, manual técnico y propuesta para psicólogos (MD y PDF) |
 | [gestor_servicios_hogar](gestor_servicios_hogar/documentacion) | Manual de usuario (MD y PDF) |
-| [juegomaletines](juegomaletines/documentacion) | Presentación del proyecto (PDF) |
+| [juegomaletines](juegomaletines/documentacion) | Manual de usuario: juego y dinámicas (MD y PDF) y presentación del proyecto (PDF) |
 | [llamadosControl](llamadosControl/documentacion) | Manual de usuario (MD y PDF) |
 | [monarca](monarca/documentacion) | Documento de requerimientos (Word) |
 | [monitor-status](monitor-status/documentacion) | Manual de usuario (MD y PDF) y documentación técnica: arquitectura, configuración, estructura y resolución de problemas |
