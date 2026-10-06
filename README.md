@@ -12,7 +12,8 @@ En cada proyecto, la carpeta `documentacion/` tiene solo un `LEEME.md` que remit
 
 | Proyecto | Contenido |
 |---|---|
-| [controlHorasClientes](controlHorasClientes/documentacion) | Detalle ampliado de la aplicación |
+| [base_smconsultores](base_smconsultores/documentacion) | Manual de usuario (MD y PDF) |
+| [controlHorasClientes](controlHorasClientes/documentacion) | Manual de usuario (MD y PDF) y detalle ampliado de la aplicación |
 | [Espacia-test](Espacia-test/documentacion) | Manual de usuario, readme extendido y requerimientos |
 | [gestor-imagenes-cloudinary](gestor-imagenes-cloudinary/documentacion) | Manuales de usuario: administrador y clientes por tipo de enlace (MD y PDF) |
 | [gestor_pruebas_llamados](gestor_pruebas_llamados/documentacion) | Manual de usuario, manual técnico y propuesta para psicólogos (MD y PDF) |
@@ -22,7 +23,8 @@ En cada proyecto, la carpeta `documentacion/` tiene solo un `LEEME.md` que remit
 | [monitor-status-test](monitor-status-test/documentacion) | Documentación técnica (copia de pruebas de monitor-status) |
 | [monitor-status2](monitor-status2/documentacion) | Documentación técnica: arquitectura, configuración, estructura y resolución de problemas |
 | [proyectivasnuevas](proyectivasnuevas/documentacion) | Manual de usuario de PsiMatrix (MD y PDF) |
-| [reportes-dashboard](reportes-dashboard/documentacion) | Arquitectura del dashboard y guía para crear informes |
+| [reportes-dashboard](reportes-dashboard/documentacion) | Manual de usuario (MD y PDF), arquitectura del dashboard y guía para crear informes |
+| [techfaro-webutilidades](techfaro-webutilidades/documentacion) | Manual de usuario (MD y PDF) |
 | [Residencial_Blanco](Residencial_Blanco/documentacion) | Documento de requerimientos (Word) |
 
 ## Agregar o actualizar la documentación de un proyecto
