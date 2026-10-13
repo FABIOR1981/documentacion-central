@@ -10627,7 +10627,7 @@ module.exports = { validateIdentityToken };
 ```md
 # Espacia
 
-Espacia es una aplicación web para la gestión de reservas, usuarios y reportes en entornos colaborativos o institucionales. El proyecto utiliza tecnologías web modernas (HTML, CSS, JavaScript) y arquitectura JAMstack, facilitando su despliegue en Netlify.
+Espacia es una aplicación web para la gestión de reservas, usuarios y reportes en entornos colaborativos o institucionales. El proyecto utiliza tecnologías web modernas (HTML, CSS, JavaScript) y arquitectura JAMstack, facilitando su despliegue en Netlify...
 
 ## Características principales (ok)
 - Gestión de reservas y bloqueos de espacios.
