@@ -1385,8 +1385,6 @@ exports.handler = async (ev) => {
     return resp(500, { error: 'Error del servidor' });
   }
 };
-
-
 ```
 
 ### Archivo: `servicio.js`
