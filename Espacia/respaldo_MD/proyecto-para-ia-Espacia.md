@@ -2686,7 +2686,7 @@ if ('serviceWorker' in navigator && SHOW_UPDATE_MODAL) {
 ```md
 # Manual del Administrador
 
-Espacia: control de usuarios, permisos, reservas e informes
+Espacia: control de usuarios, permisos, reservas e informes11
 
 ---
 
