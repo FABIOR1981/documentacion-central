@@ -112,15 +112,16 @@ jobs:
                       f.write(armar(nombre, destino))
                   ok.append(nombre)
                   print(f'OK     {nombre}')
-              except Exception:
+              except Exception as e:
                   fallos.append(nombre)
-                  print(f'ERROR  {nombre}: no se pudo clonar o generar (revisa que el token tenga acceso al repo)')
+                  detalle = (getattr(e, 'stderr', '') or str(e)).replace(TOKEN, '***').strip()
+                  print(f'::warning::{nombre}: no se pudo clonar o generar (revisa que el repo exista y que el token tenga acceso). {detalle}')
 
           resumen = os.environ.get('GITHUB_STEP_SUMMARY')
           if resumen:
               with open(resumen, 'a', encoding='utf-8') as f:
                   f.write(f'### Respaldos\n- Generados: {len(ok)} ({", ".join(ok) or "ninguno"})\n- Con error: {len(fallos)} ({", ".join(fallos) or "ninguno"})\n')
-          if fallos:
+          if fallos and not ok:
               sys.exit(1)
           EOF
 
