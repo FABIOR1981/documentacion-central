@@ -766,7 +766,7 @@ const FASES = {
   idea: 'Idea'
 };
 
-const VERSION = '1.6.2';
+const VERSION = '1.7.0';
 const API = '/.netlify/functions/bitacora';
 
 let densidad = (() => {
@@ -818,6 +818,7 @@ const ICONOS = {
   sort: generarSVG('<path d="M7 4v16M4 17l3 3 3-3M17 20V4m-3 3 3-3 3 3"/>'),
   doc: generarSVG('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>'),
   down: generarSVG('<path d="M12 4v11m-4-4 4 4 4-4M5 20h14"/>'),
+  refresh: generarSVG('<path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>'),
   edit: generarSVG('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>'),
   repo: generarSVG('<path d="M6 3v12"/><circle cx="18" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M18 8.5a9 9 0 0 1-9 9"/>')
 };
@@ -1208,31 +1209,67 @@ $('#version').textContent = 'Bitácora v' + VERSION;
 const extraerRepo = url => (url || '').replace(/^https?:\/\/github\.com\//, '').replace(/\/$/, '');
 const apiPeticion = cuerpo => fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clave: acceso, ...cuerpo }) });
 const formatearTamano = bytes => bytes < 1024 ? bytes + ' B' : bytes < 1048576 ? Math.round(bytes / 1024) + ' KB' : (bytes / 1048576).toFixed(1) + ' MB';
+const formatearFecha = iso => new Date(iso).toLocaleString('es-UY', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+let docsAbierto = null;
 
 async function verDocumentacion(id) {
   const proyecto = datos.find(x => x.id === id);
   if (!proyecto) return;
-  
+
   const repoDocs = proyecto.docs || extraerRepo(proyecto.repo) || 'FABIOR1981/' + proyecto.nombre;
+  docsAbierto = id;
   $('#tDocs').textContent = 'Documentación · ' + obtenerNombreVisible(proyecto);
   $('#listaDocs').innerHTML = '<p class="vacio">Buscando documentos…</p>';
-  $('#dDocs').showModal();
-  
+  if (!$('#dDocs').open) $('#dDocs').showModal();
+
   try {
     const respuesta = await apiPeticion({ accion: 'docs', repo: repoDocs });
     const json = await respuesta.json();
     if (!respuesta.ok) throw new Error(json.error || 'Error ' + respuesta.status);
-    
-    $('#listaDocs').innerHTML = json.archivos.length ? json.archivos.map(archivo => `
+
+    const hayRespaldo = json.archivos.some(a => /\.md$/i.test(a.nombre));
+    $('#listaDocs').innerHTML = json.archivos.length ? json.archivos.map(archivo => {
+      const esRespaldo = /\.md$/i.test(archivo.nombre);
+      const detalle = formatearTamano(archivo.tam) + (archivo.fecha ? ' · generado el ' + formatearFecha(archivo.fecha) : '');
+      // Botón de regenerar solo en el respaldo; en las demás filas va uno invisible para que "Abrir" quede alineado
+      const extra = esRespaldo
+        ? `<button class="btn" data-regen="${escaparHTML(repoDocs)}" data-id="${escaparHTML(id)}" aria-label="Regenerar respaldo" title="Regenerar respaldo">${ICONOS.refresh}</button>`
+        : (hayRespaldo ? `<button class="btn" style="visibility:hidden" tabindex="-1" aria-hidden="true">${ICONOS.refresh}</button>` : '');
+      return `
       <div class="doc">
-        <span>${escaparHTML(archivo.nombre)}<small>${formatearTamano(archivo.tam)}</small></span>
+        <span style="flex:1">${escaparHTML(archivo.nombre)}<small>${escaparHTML(detalle)}</small></span>
         <a class="btn" href="${escaparHTML(archivo.url)}" target="_blank" rel="noopener">${ICONOS.down} Abrir</a>
-      </div>
-    `).join('') : '<p class="vacio">Sin PDF en documentación central para este proyecto.</p>';
+        ${extra}
+      </div>`;
+    }).join('') : '<p class="vacio">Sin documentos en documentación central para este proyecto.</p>';
   } catch (err) {
     $('#listaDocs').innerHTML = `<p class="aviso">${escaparHTML(err.message)}</p>`;
   }
 }
+
+// Regenera el respaldo .md: dispara el workflow del proyecto y refresca la lista a los 60 s
+async function regenerarRespaldo(boton) {
+  if (boton.dataset.ocupado) return;
+  boton.dataset.ocupado = '1';
+  const nota = boton.closest('.doc').querySelector('small'), antes = nota.textContent;
+  nota.textContent = 'Solicitando…';
+  try {
+    const respuesta = await apiPeticion({ accion: 'regenerar', repo: boton.dataset.regen });
+    const json = await respuesta.json();
+    if (!respuesta.ok) throw new Error(json.error || 'Error ' + respuesta.status);
+    nota.textContent = 'Generando… tarda cerca de 1 minuto';
+    setTimeout(() => { if ($('#dDocs').open && docsAbierto === boton.dataset.id) verDocumentacion(boton.dataset.id); }, 60000);
+  } catch (err) {
+    nota.textContent = err.message;
+    setTimeout(() => { nota.textContent = antes; delete boton.dataset.ocupado; }, 6000);
+  }
+}
+
+$('#listaDocs').addEventListener('click', e => {
+  const boton = e.target.closest('[data-regen]');
+  if (boton) regenerarRespaldo(boton);
+});
+
 ```
 
 ### Archivo: `manifest.webmanifest`
@@ -1274,7 +1311,7 @@ async function verDocumentacion(id) {
 ### Archivo: `netlify/functions/bitacora.js`
 ```javascript
 // Netlify Function: único lugar que conoce el token de GitHub.
-// Variables de entorno en Netlify: GITHUB_TOKEN, CLAVE_ADMIN, GITHUB_TOKEN_DOCUMENTACION_CENTRAL (y opcionales GITHUB_REPO, DOCS_REPO)
+// Variables de entorno en Netlify: GITHUB_TOKEN, CLAVE_ADMIN, GITHUB_TOKEN_DOCUMENTACION_CENTRAL GITHUB_TOKEN_ACTIONS (y opcionales GITHUB_REPO, DOCS_REPO, WORKFLOW_EMPAQUETADOR)
 const crypto = require('crypto');
 const REPO = process.env.GITHUB_REPO || 'FABIOR1981/bd';
 const RUTA = 'bitacora/proyectos.json';
@@ -1285,6 +1322,8 @@ const MIME = { pdf: 'application/pdf', md: 'text/markdown; charset=utf-8', doc: 
 const esPdf = n => /\.pdf$/i.test(String(n || '')); // en "documentacion" solo se muestran y sirven PDF
 const esMd = n => /\.md$/i.test(String(n || ''));   // en "respaldo_MD" solo se muestran y sirven .md
 const MAX_BYTES = 4 * 1024 * 1024; // tope de descarga por la función
+const WORKFLOW = process.env.WORKFLOW_EMPAQUETADOR || 'llamarEmpaquetador.yml'; // workflow de cada proyecto que genera el respaldo
+const RAMA_PROYECTO = 'main';
 const VIGENCIA_ENLACE = 15 * 60; // segundos que dura el enlace de un documento
 const VER_EN_NAVEGADOR = ['pdf']; // solo el PDF se abre en el navegador; el resto (incluido .md) se descarga
 
@@ -1304,27 +1343,56 @@ const enlace = ruta => { const exp = Math.floor(Date.now() / 1000) + VIGENCIA_EN
 const enlaceOk = q => permitido(q.doc || '') && Number(q.exp) > Date.now() / 1000 && igual(q.f || '', firma(q.doc, q.exp));
 const rutaOk = (repo, p) => permitido(String(p || '')) && String(p).startsWith(nombreRepo(repo) + '/');
 
+// Fecha del último commit de un archivo en documentacion-central (cuándo cambió el respaldo por última vez)
+async function fechaArchivo(ruta) {
+  try {
+    const r = await fetch(`https://api.github.com/repos/${DOCS_REPO}/commits?path=${encodeURIComponent(ruta)}&per_page=1`, { headers: cabDocs() });
+    if (!r.ok) return null;
+    const c = await r.json();
+    return (Array.isArray(c) && c[0] && c[0].commit && c[0].commit.committer && c[0].commit.committer.date) || null;
+  } catch (e) { return null; }
+}
+
 // Lista los archivos de una carpeta del repositorio documentacion-central (si no existe, devuelve vacío)
-async function listarCarpeta(carpeta, permitidoFn, rotulo) {
+async function listarCarpeta(carpeta, permitidoFn, conFecha) {
   const r = await fetch(`https://api.github.com/repos/${DOCS_REPO}/contents/${carpeta.split('/').map(encodeURIComponent).join('/')}`, { headers: cabDocs() });
   if (r.status === 404) return [];
   if (!r.ok) throw new Error('GitHub respondió ' + r.status + ' (¿el token tiene acceso a documentacion-central?)');
   const lista = await r.json();
-  return (Array.isArray(lista) ? lista : []).filter(f => f.type === 'file' && permitidoFn(f.name))
-    .map(f => ({ nombre: rotulo + f.name, ruta: f.path, tam: f.size, url: enlace(f.path) })).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+  const archivos = (Array.isArray(lista) ? lista : []).filter(f => f.type === 'file' && permitidoFn(f.name));
+  const filas = await Promise.all(archivos.map(async f => ({ nombre: f.name, ruta: f.path, tam: f.size, url: enlace(f.path), fecha: conFecha ? await fechaArchivo(f.path) : null })));
+  return filas.sort((x, y) => x.nombre.localeCompare(y.nombre, 'es'));
 }
 
 // Junta los PDF de "<repo>/documentacion" y los .md de "<repo>/respaldo_MD"
 async function listar(repo) {
   try {
     const [pdf, md] = await Promise.all([
-      listarCarpeta(carpetaDocs(repo), esPdf, ''),
-      listarCarpeta(carpetaRespaldo(repo), esMd, '')
+      listarCarpeta(carpetaDocs(repo), esPdf, false),
+      listarCarpeta(carpetaRespaldo(repo), esMd, true)
     ]);
     return resp(200, { archivos: [...pdf, ...md] });
   } catch (e) {
     return resp(502, { error: e.message });
   }
+}
+
+// Dispara a demanda el workflow del proyecto que regenera el respaldo .md (requiere GITHUB_TOKEN_ACTIONS)
+async function regenerar(repo) {
+  if (!process.env.GITHUB_TOKEN_ACTIONS) return resp(500, { error: 'Falta configurar GITHUB_TOKEN_ACTIONS en Netlify' });
+  const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/${WORKFLOW}/dispatches`, {
+    method: 'POST',
+    headers: cab({ Authorization: 'Bearer ' + process.env.GITHUB_TOKEN_ACTIONS, 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ ref: RAMA_PROYECTO })
+  });
+  if (r.status === 204) return resp(200, { ok: true });
+  const mensajes = {
+    404: 'Este proyecto no tiene el empaquetador instalado (falta ' + WORKFLOW + ') o el token no tiene acceso al repo',
+    422: WORKFLOW + ' no tiene workflow_dispatch o la rama ' + RAMA_PROYECTO + ' no existe',
+    401: 'El token de Actions no es válido',
+    403: 'El token de Actions no tiene permiso para ejecutar workflows'
+  };
+  return resp(502, { error: mensajes[r.status] || 'GitHub respondió ' + r.status });
 }
 
 // Devuelve un archivo de documentacion-central para descargarlo
@@ -1362,9 +1430,11 @@ exports.handler = async (ev) => {
     if (ev.httpMethod !== 'POST') return resp(405, { error: 'Método no permitido' });
     if (!claveOk(cuerpo.clave)) return resp(401, { error: 'Clave inválida' });
 
-    if (cuerpo.accion === 'docs' || cuerpo.accion === 'bajar') {
+    if (['docs', 'bajar', 'regenerar'].includes(cuerpo.accion)) {
       if (!repoOk(cuerpo.repo)) return resp(400, { error: 'Repositorio inválido' });
-      return cuerpo.accion === 'docs' ? await listar(cuerpo.repo) : await bajar(cuerpo.repo, cuerpo.ruta);
+      if (cuerpo.accion === 'docs') return await listar(cuerpo.repo);
+      if (cuerpo.accion === 'regenerar') return await regenerar(cuerpo.repo);
+      return await bajar(cuerpo.repo, cuerpo.ruta);
     }
 
     const meta = await fetch(`${API}?ref=${RAMA}`, { headers: cab() });
