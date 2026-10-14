@@ -2499,187 +2499,187 @@ if ('serviceWorker' in navigator && SHOW_UPDATE_MODAL) {
 
 ### Archivo: `documentacion/Manual_Administrador.pdf`
 ```pdf
-[Archivo Binario o No Leíble]
+[Archivo omitido: pesa mas de 500 KB]
 ```
 
 ### Archivo: `documentacion/Manual_Gestor.pdf`
 ```pdf
-[Archivo Binario o No Leíble]
+[Archivo omitido: pesa mas de 500 KB]
 ```
 
 ### Archivo: `documentacion/Manual_Usuario.pdf`
 ```pdf
-[Archivo Binario o No Leíble]
+[Archivo omitido: pesa mas de 500 KB]
 ```
 
 ### Archivo: `documentacion/img/a01_agenda.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/a02_agendando_para.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/a03_detalle.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/a04_agenda_bloqueo.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/a05_reservas.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/a06_informe.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/a07_bloqueo.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/a08_bloqueo_confirmar.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/a09_usuarios.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/a10_nuevo_usuario.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/a11_editar_usuario.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/a12_inactivar.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/g01_agenda.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/g02_agendando_para.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/g03_detalle.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/g04_agenda_bloqueo.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/g05_reservas.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/g06_informe.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/g07_bloqueo.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/g08_bloqueo_confirmar.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/g09_usuarios.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/g10_nuevo_usuario.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/g11_editar_usuario.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/g12_inactivar.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/u01_login.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/u02_cambio_pass.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/u03_agenda.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/u04_duracion.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/u05_confirmada.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/u06_detalle.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/u07_mis_reservas.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/u08_cancelar.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/u09_movil.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/img/u10_movil_menu.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `documentacion/manual_admin.md`
@@ -3969,17 +3969,17 @@ Este documento describe los requerimientos funcionales y no funcionales de maner
 
 ### Archivo: `imagenes/icon-192.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `imagenes/icon-512.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo omitido: pesa mas de 500 KB]
 ```
 
 ### Archivo: `imagenes/logo_demaria.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `index.html`

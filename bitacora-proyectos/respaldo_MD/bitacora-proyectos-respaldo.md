@@ -670,17 +670,17 @@ También se puede consultar desde la bitácora de proyectos.
 
 ### Archivo: `iconos/icono-192.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `iconos/icono-512.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `iconos/icono-apple.png`
 ```png
-[Archivo Binario o No Leíble]
+[Archivo Binario o No Leible]
 ```
 
 ### Archivo: `index.html`
