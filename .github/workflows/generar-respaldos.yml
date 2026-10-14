@@ -1,0 +1,144 @@
+name: Generar respaldos para IA
+
+# Este es el unico archivo del proceso: los proyectos no llevan nada.
+# Ejecucion manual: Actions -> Generar respaldos para IA -> Run workflow.
+on:
+  workflow_dispatch:
+    inputs:
+      proyecto:
+        description: 'Nombre del repo (por ejemplo Espacia-test) o "todos"'
+        required: true
+        default: 'todos'
+
+permissions:
+  contents: write # para guardar los respaldos en este mismo repo
+
+concurrency:
+  group: generar-respaldos
+  cancel-in-progress: false
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. Descargar documentacion-central
+        uses: actions/checkout@v4
+
+      - name: 2. Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 3. Generar los respaldos
+        env:
+          TOKEN_LECTURA: ${{ secrets.TOKEN_LECTURA_PROYECTOS }}
+          PROYECTO: ${{ inputs.proyecto }}
+        run: |
+          python3 - <<'EOF'
+          import os, re, json, subprocess, sys, tempfile, urllib.request, urllib.error
+
+          CUENTA = 'FABIOR1981'
+          TOKEN = os.environ['TOKEN_LECTURA']
+          PEDIDO = os.environ.get('PROYECTO', 'todos').strip().split('/')[-1] or 'todos'
+          EXCLUIR = {'documentacion-central', 'bd'}          # repos que nunca se respaldan
+          IGNORAR = {'node_modules', '.git', '.github'}      # carpetas que no entran al respaldo
+          MAX_ARCHIVO = 500 * 1024                           # archivos mas grandes se listan pero no se copian
+
+          # 1. Lista de proyectos: la misma que usa la Bitacora (repo bd, bitacora/proyectos.json)
+          try:
+              req = urllib.request.Request(
+                  f'https://api.github.com/repos/{CUENTA}/bd/contents/bitacora/proyectos.json',
+                  headers={'Authorization': f'Bearer {TOKEN}', 'Accept': 'application/vnd.github.raw+json', 'User-Agent': 'respaldos'})
+              with urllib.request.urlopen(req) as r:
+                  datos = json.loads(r.read().decode('utf-8'))
+          except urllib.error.HTTPError as e:
+              sys.exit(f'No pude leer bd/bitacora/proyectos.json (HTTP {e.code}). Revisa el secret TOKEN_LECTURA_PROYECTOS.')
+
+          repos = []
+          for p in datos.get('proyectos', []):
+              repo = (p.get('docs') or '').strip() or (f"{CUENTA}/{p['nombre']}" if p.get('nombre') else '')
+              repo = re.sub(r'\.git$', '', repo)
+              if re.fullmatch(CUENTA + r'/[\w.-]+', repo) and repo.split('/')[1] not in EXCLUIR and repo not in repos:
+                  repos.append(repo)
+
+          if PEDIDO.lower() != 'todos':
+              disponibles = sorted(r.split('/')[1] for r in repos)
+              repos = [r for r in repos if r.split('/')[1].lower() == PEDIDO.lower()]
+              if not repos:
+                  sys.exit(f'"{PEDIDO}" no esta en la Bitacora. Proyectos disponibles: ' + (', '.join(disponibles) or '(ninguno)'))
+
+          def ignorable(ruta):
+              return any(p in IGNORAR or p.startswith('.') for p in ruta.split(os.sep)) or ruta.endswith('-respaldo.md')
+
+          def armar(nombre, carpeta):
+              archivos = []
+              for root, dirs, files in os.walk(carpeta):
+                  dirs[:] = [d for d in dirs if not ignorable(os.path.relpath(os.path.join(root, d), carpeta))]
+                  for f in files:
+                      ruta = os.path.relpath(os.path.join(root, f), carpeta)
+                      if not ignorable(ruta):
+                          archivos.append(ruta.replace(os.sep, '/'))
+              archivos.sort()
+              salida = f'# Bundle del Proyecto para IA: {nombre}\n\n## Estructura de Archivos\n'
+              salida += ''.join(f'- {a}\n' for a in archivos)
+              salida += '\n---\n\n## Código Fuente\n\n'
+              for a in archivos:
+                  lang = os.path.splitext(a)[1].lower().lstrip('.')
+                  lang = 'javascript' if lang == 'js' else lang
+                  ruta = os.path.join(carpeta, a)
+                  if os.path.getsize(ruta) > MAX_ARCHIVO:
+                      contenido = f'[Archivo omitido: pesa mas de {MAX_ARCHIVO // 1024} KB]'
+                  else:
+                      try:
+                          with open(ruta, 'r', encoding='utf-8') as fh:
+                              contenido = fh.read()
+                      except Exception:
+                          contenido = '[Archivo Binario o No Leible]'
+                  salida += f'### Archivo: `{a}`\n```{lang}\n{contenido}\n```\n\n'
+              return salida
+
+          # 2. Por cada proyecto: clonar, armar el .md y guardarlo en <proyecto>/respaldo_MD/
+          ok, fallos = [], []
+          base = tempfile.mkdtemp()
+          for repo in repos:
+              nombre = repo.split('/')[1]
+              destino = os.path.join(base, nombre)
+              try:
+                  subprocess.run(['git', 'clone', '--depth', '1', '--quiet', f'https://x-access-token:{TOKEN}@github.com/{repo}.git', destino],
+                                 check=True, capture_output=True, text=True)
+                  carpeta_md = os.path.join(nombre, 'respaldo_MD')
+                  os.makedirs(carpeta_md, exist_ok=True)
+                  with open(os.path.join(carpeta_md, f'{nombre}-respaldo.md'), 'w', encoding='utf-8', newline='\n') as f:
+                      f.write(armar(nombre, destino))
+                  ok.append(nombre)
+                  print(f'OK     {nombre}')
+              except Exception:
+                  fallos.append(nombre)
+                  print(f'ERROR  {nombre}: no se pudo clonar o generar (revisa que el token tenga acceso al repo)')
+
+          resumen = os.environ.get('GITHUB_STEP_SUMMARY')
+          if resumen:
+              with open(resumen, 'a', encoding='utf-8') as f:
+                  f.write(f'### Respaldos\n- Generados: {len(ok)} ({", ".join(ok) or "ninguno"})\n- Con error: {len(fallos)} ({", ".join(fallos) or "ninguno"})\n')
+          if fallos:
+              sys.exit(1)
+          EOF
+
+      - name: 4. Guardar los cambios en documentacion-central
+        if: always()
+        env:
+          PROYECTO: ${{ inputs.proyecto }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "Sin cambios: los respaldos ya estaban al dia."
+            exit 0
+          fi
+          git commit -m "chore: actualizar respaldos (${PROYECTO})"
+          for intento in 1 2 3; do
+            git push && exit 0
+            git pull --rebase
+          done
+          exit 1
